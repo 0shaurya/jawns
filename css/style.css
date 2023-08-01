@@ -1,0 +1,49 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+
+p {
+	color: white;
+}
+
+.container {
+	display: grid;
+	grid-template-columns: 10% 1024px 1fr;
+	grid-template-rows: 10% 576px 1fr;
+	grid-template-areas:
+		"top-toolbar top-toolbar properties-tab"
+		"left-toolbar simulation properties-tab"
+		"time-slider time-slider time-slider";
+	height: 100vh;
+}
+
+.top-toolbar {
+	grid-area: top-toolbar;
+	background-color: #222222;
+}
+
+.left-toolbar {
+	grid-area: left-toolbar;
+	background-color: #222222;
+}
+
+.properties-tab {
+	grid-area: properties-tab;
+	background-color: #222222;
+}
+
+.simulation {
+	grid-area: simulation;
+}
+
+.time-slider {
+	grid-area: time-slider;
+	background-color: #222222;
+}
+
+#canv {
+	width: 100%;
+	height: 100%;
+	background-color: rgb(20 20 20);
+}

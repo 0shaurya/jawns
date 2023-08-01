@@ -1,0 +1,29 @@
+#entityContextMenu {
+	background-color: #333333;
+	padding: 5px 0px 5px 0px;
+	position: fixed;
+	z-index: 9999;
+	visibility: hidden;
+	width: 150px;
+	border-radius: 5px;
+
+	user-select: none;
+}
+
+#entityContextMenu div {
+	background-color: #333333;
+	padding: 2px 0px 2px 8px;
+	height: fit-content;
+
+	justify-content: center;
+}
+
+#entityContextMenu div:hover {
+	cursor: pointer;
+	background-color: #555555;
+}
+
+#entityContextMenu div span {
+	color: #dddddd;
+	font-size: 14px;
+}

@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap');
+
+#entityInfo {
+	background-color: #333333;
+	padding: 5px 0px 5px 0px;
+	position: fixed;
+	z-index: 9000;
+	visibility: hidden;
+	width: 200px;
+	border-radius: 5px;
+
+	user-select: none;
+}
+
+#entityInfo p {
+	background-color: #333333;
+	padding: 2px 0px 2px 8px;
+	height: fit-content;
+
+	justify-content: center;
+	color: #dddddd;
+	font-size: 14px;
+	font-family: 'Courier Prime', monospace;
+}
+
+#entityType {
+	font-weight: bolder;
+}
