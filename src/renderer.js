@@ -228,11 +228,11 @@ function renderFrame(frame) {
 
 	if (shiftKeyDown) {
 		frame.particles.forEach((item) => {
-			if (!item.isDeleted) drawBall(item.position.x, item.position.y, 30, 'red');
+			if (!item.isDeleted) drawBall(item.position.x, item.position.y, 3, 'red');
 		});
 	} else {
 		frame.particles.forEach((item) => {
-			if (!item.isDeleted) drawBall(item.position.x, item.position.y, 30, item.color);
+			if (!item.isDeleted) drawBall(item.position.x, item.position.y, 1*(hActualToPixel(item.radius) - hActualToPixel(0)), item.color);
 		});
 	}
 

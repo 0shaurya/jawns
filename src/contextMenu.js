@@ -8,6 +8,7 @@ let contextMenu = document.getElementById("contextMenu");
 let entityContextMenu = document.getElementById("entityContextMenu")
 let entityInfo = document.getElementById('entityInfo');
 let entityMass = document.getElementById('entityMass');
+let entityRadius = document.getElementById('entityRadius');
 let entityType = document.getElementById('entityType');
 let entityPosition = document.getElementById('entityPosition');
 let entityVelocity = document.getElementById('entityVelocity');
@@ -42,7 +43,7 @@ function hideAllMenus() {
 
 document.getElementById("canv").addEventListener('contextmenu', (e) => {
 	engine.particles.forEach((item, index) => {
-		if (inRange(hActualToPixel(mousePosition.x), hActualToPixel(item.position.x), 5) && inRange(vActualToPixel(mousePosition.y), vActualToPixel(item.position.y), 5)) {
+		if (inRange(hActualToPixel(mousePosition.x), hActualToPixel(item.position.x), 5) && inRange(vActualToPixel(mousePosition.y), vActualToPixel(item.position.y), 5) && !item.isDeleted) {
 			hideAllMenus();
 			entityContextMenu.style.top = vActualToPixel(mousePosition.y) + canvas.getBoundingClientRect().top + "px";
 			entityContextMenu.style.left = hActualToPixel(mousePosition.x) + canvas.getBoundingClientRect().left + "px";
@@ -103,7 +104,7 @@ document.getElementById("contextMenu").addEventListener('click', function (e) {
 document.body.addEventListener('keydown', (e) => {
 	if (e.shiftKey) {
 		engine.particles.forEach((item, index) => {
-			if (inRange(hActualToPixel(mousePosition.x), hActualToPixel(item.position.x), 5) && inRange(vActualToPixel(mousePosition.y), vActualToPixel(item.position.y), 5)) {
+			if (inRange(hActualToPixel(mousePosition.x), hActualToPixel(item.position.x), 5) && inRange(vActualToPixel(mousePosition.y), vActualToPixel(item.position.y), 5) && !item.isDeleted) {
 				entityInfo.style.left = hActualToPixel(item.position.x) + canvas.getBoundingClientRect().left + "px";
 				entityInfo.style.top = vActualToPixel(item.position.y) + canvas.getBoundingClientRect().top + "px";
 				entityInfo.style.visibility = 'visible';
@@ -111,6 +112,7 @@ document.body.addEventListener('keydown', (e) => {
 
 				entityType.textContent = item.isBolted ? "Particle (" + item.id + ")" + " (Bolted)" : "Particle (" + item.id + ")";
 				entityMass.textContent = "mass: " + item.mass;
+				entityRadius.textContent = "radius: " + item.radius;
 				entityPosition.textContent     = "p: " + getPosition(item);
 				entityVelocity.textContent     = "v: " + getVelocity(item);
 				entityAcceleration.textContent = "a: " + getAcceleration(item);

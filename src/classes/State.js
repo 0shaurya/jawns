@@ -7,7 +7,7 @@ export class State {
 		this.time = time;
 		this.particles = [];
 		particles.forEach((item, index) => {
-			this.particles.push(new Particle(item.id, item.position.x, item.position.y, item.mass, item.charge, {x: item.velocity.x, y: item.velocity.y}, item.isBolted, item.isDeleted, item.color))
+			this.particles.push(new Particle(item.id, item.position.x, item.position.y, item.mass, item.radius, {x: item.velocity.x, y: item.velocity.y}, item.isBolted, item.isDeleted, item.color))
 		})
 	}
 }
