@@ -11,17 +11,21 @@ export class Vector {
 	subtract(vector) {
 		return new Vector(this.x - vector.x, this.y - vector.y);
 	}
-	
+
 	scale(scalar) {
 		return new Vector(this.x * scalar, this.y * scalar);
 	}
-	
+
 	dot(vector) {
 		return this.x * vector.x + this.y * vector.y; 
 	}
 
 	magnitude() {
 		return Math.sqrt(this.x*this.x + this.y*this.y);
+	}
+
+	addScalar(scalar) {
+		return this.scale((this.magnitude() + scalar) / this.magnitude());
 	}
 
 	normalize() {

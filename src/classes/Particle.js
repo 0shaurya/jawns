@@ -46,7 +46,7 @@ export class Particle {
 			}
 		})
 		this.acceleration = g;
-
+		
 		// updates velocity
 		this.velocity = this.velocity.add(this.acceleration.scale(dt));
 		

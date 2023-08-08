@@ -16,6 +16,8 @@ import { calculateGravitationalFieldAtPointExcludingAParticle } from './gravitat
 
 import { mousePosition } from './zoomingpanning.js';
 
+import { Vector } from './classes/Vector.js';
+
 const canvas = document.getElementById("canv");
 const ctx = canvas.getContext("2d");
 
@@ -28,6 +30,29 @@ function drawBall(x, y, r, color, alpha = 1) {
 	ctx.globalAlpha = alpha;
 	ctx.fillStyle = color;
 	ctx.fill();
+	ctx.stroke();
+}
+
+function drawOrbit(particle1, particle2, color, alpha = 1) {
+	let f;
+
+	if (particle1.mass > particle2.mass) {
+		f = new Vector(particle1.position.x, particle1.position.y);
+	} else {
+		f = new Vector(particle2.position.x, particle2.position.y);
+	}
+
+
+	let ap1 = engine.calculateOrbitLengths(particle1, particle2).apside1;
+	let ap2 = engine.calculateOrbitLengths(particle1, particle2).apside2;
+
+	let a = (ap1 + ap2) / 2;
+	let b = Math.sqrt(ap1 * ap2);
+	let c = f.addScalar(-Math.sqrt(a*a - b*b));
+
+	ctx.strokeStyle = color;
+	ctx.beginPath()
+	ctx.ellipse(hActualToPixel(c.x), vActualToPixel(c.y), Math.abs(hActualToPixel(a) - hActualToPixel(0)), Math.abs(vActualToPixel(b)-vActualToPixel(0)), -particle1.position.angleBetween(particle2.position), 0, 2*Math.PI)
 	ctx.stroke();
 }
 
@@ -74,7 +99,7 @@ function roundUpNearest(value, nearest) {
 }
 
 function generateGridlineText(value, gridStep) {
-	if (value > -0.000000001 && value < 0.000000001) {
+	if (value > -0.00001 && value < 0.00001) {
 		return 0;
 	}
 
@@ -110,7 +135,7 @@ function drawGridlines() {
 	// vertical lines
 	i = hActualToPixel(roundUpNearest(hPixelToActual(32), gridStep));
 	while (i <= canvas.width && i >= 32) {
-		ctx.lineWidth = (hPixelToActual(i).toFixed(5) == 0) ? 3 : 1;
+		ctx.lineWidth = (hPixelToActual(i).toFixed(1) == 0) ? 3 : 1;
 		
 		ctx.beginPath();
 		ctx.moveTo(i+.5, 0);
@@ -124,7 +149,7 @@ function drawGridlines() {
 	// horizontal lines
 	i = vActualToPixel(roundUpNearest(vPixelToActual(canvas.height-32), gridStep));
 	while (i <= canvas.height - 32 && i >= 0) {
-		ctx.lineWidth = (vPixelToActual(i).toFixed(5) == 0) ? 3 : 1;
+		ctx.lineWidth = (vPixelToActual(i).toFixed(1) == 0) ? 3 : 1;
 		
 		ctx.beginPath();
 		ctx.moveTo(32, i+.5);
@@ -235,6 +260,19 @@ function renderFrame(frame) {
 			if (!item.isDeleted) drawBall(item.position.x, item.position.y, 1*(hActualToPixel(item.radius) - hActualToPixel(0)), item.color);
 		});
 	}
+
+	drawOrbit(engine.particles[0], engine.particles[1], "white");
+	drawOrbit(engine.particles[0], engine.particles[2], "white");
+	drawOrbit(engine.particles[0], engine.particles[4], "red");
+	drawOrbit(engine.particles[0], engine.particles[5], "white");
+	drawOrbit(engine.particles[0], engine.particles[6], "white");
+	drawOrbit(engine.particles[0], engine.particles[7], "white");
+	drawOrbit(engine.particles[3], engine.particles[4], "yellow");
+
+	//drawOrbit(engine.particles[0], engine.particles[8], "white");
+	//drawOrbit(engine.particles[0], engine.particles[9], "white");
+	//drawOrbit(engine.particles[0], engine.particles[10], "white");
+	//drawOrbit(engine.particles[3], engine.particles[4], "red");
 
 	if (gridlinesOn) drawGridNumbers();
 

@@ -21,7 +21,8 @@
 		<p id = "time">time:</p>
 		<button id = "gridlines">Gridlines on/off</button>
 		<button id = "gravField">Gravitational Field on/off</button>
-		<input type = "number" id = "timeSpeed" value = "1"></input>
+		Speed: <input type = "text" id = "timeSpeed" value = "1d" size = "5"></input>
+		Step: <input type = "text" id = "timeStep" value = ".25d" size = "5"></input>
 		<br>
 		<p id = "fps">FPS: </p>
 		<p id = "frametime">Frametime:</p>
@@ -38,7 +39,15 @@
 		<!-- Add your toolbar elements here -->
 	</div>
 
-	<div class="properties-tab">
+	<div class="properties-tab" style="line-height:1.5; padding-left:5px">
+		<p id = "followingTime"></p>
+		<p id = "updatingTime"></p>
+		<p id = "updatingPhysicsTime"></p>
+		<p id = "collisionsTime"></p>
+		<p id = "updatingValsTime"></p>
+		<p id = "renderingTime"></p>
+		<br><br><br><br>
+		<div id = "effectivePotentials" style="color:white"></div>
 		<!-- Properties Tab -->
 		<!-- Add your properties elements here -->
 	</div>
@@ -74,6 +83,7 @@
 <div id="entityInfo">
 	<p id="entityType"></p>
 	<p id="entityMass"></p>
+	<p id="entityRadius"></p>
 	<p id="entityPosition"></p>
 	<p id="entityVelocity"></p>
 	<p id="entityAcceleration"></p>

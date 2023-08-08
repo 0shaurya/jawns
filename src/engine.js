@@ -37,40 +37,18 @@ let engine = {
 		this.particles = [];
 	},
 
+	getNumOfParticles: function() {
+		let count = 0;
+		this.particles.forEach((item, index) => {
+			if (!item.isDeleted) {
+				count += 1;
+			}
+		});
+
+		return count;
+	},
+
 	calculateCollisions: function () {
-		
-		// // create a new array 'xs' which is the array of all particles sorted by their x positions
-		// let xs = this.particles.toSorted((a, b) => {
-		// 	return a.position.x - b.position.x;
-		// });
-		// // loop through 'xs' array
-		// for (let i = 0; i < xs.length - 1; i++) {
-		// 	
-		// 	// check if the ith and (i+1)th particle is close enough to be touching in the x-direction			
-		// 	if ((xs[i+1].position.x - xs[i].position.x) < (xs[i].radius + xs[i+1].radius) && (!xs[i].isDeleted) && (!xs[i+1].isDeleted)) {
-		// 		
-		// 		// now that we know they are touching in the x-direction, check if they are touching in the y direction
-		// 		if ((xs[i+1].position.y - xs[i].position.y) < (xs[i].radius + xs[i+1].radius)) {
-		// 			
-		// 			// absorb the particle depending on which particle is bigger
-		// 			if (xs[i].mass > xs[i+1].mass) {
-		// 				engine.particles[xs[i].id].mass += xs[i+1].mass;
-		// 				engine.particles[xs[i].id].radius = Math.sqrt((engine.particles[xs[i].id].radius)**2 + ((engine.particles[xs[i+1].id].radius))**2)
-		// 				
-		// 				console.log(`[${timeToString(time)}] ${xs[i].id} swallowed ${xs[i].id}`);
-		// 				
-		// 				engine.particles[i+1].delete();
-		// 			} else {
-		// 				engine.particles[xs[i+1].id].mass += xs[i].mass;
-		// 				engine.particles[xs[i+1].id].radius = Math.sqrt((engine.particles[xs[i].id].radius)**2 + ((engine.particles[xs[i+1].id].radius))**2)
-		// 				
-		// 				console.log(`[${timeToString(time)}] ${xs[i+1].id} swallowed ${xs[i].id}`);
-		// 				
-		// 				engine.particles[i].delete();
-		// 			}
-		// 		}
-		// 	}
-		// }
 
 		engine.particles.forEach((item, index) => {
 			engine.particles.forEach((jtem, jndex) => {
@@ -93,6 +71,75 @@ let engine = {
 				}
 			})
 		});	
+	},
+
+	// https://phys.libretexts.org/Bookshelves/Classical_Mechanics/Classical_Mechanics_(Dourmashkin)/25%3A_Celestial_Mechanics/25.04%3A_Energy_Diagram_Effective_Potential_Energy_and_Orbits
+	calculateEffectivePotential: function(particle1, particle2) {
+		let r = Math.abs(particle1.position.subtract(particle2.position).magnitude());
+		let smallM = Math.min(particle1.mass, particle2.mass);
+		let bigM = Math.max(particle1.mass, particle2.mass);
+		let v = particle1.velocity.subtract(particle2.velocity).magnitude();
+		const bigG = 6.6743e-11;
+		let l = r * smallM * v;
+		let mu = (smallM * bigM)/(smallM + bigM);
+
+		return (l*l / (2 * mu * r * r)) - (bigG * smallM * bigM / r);
+	},
+
+	effectivePotentialMaxes: [],
+
+	calculateEffectivePotentialMax: function(particle1, particle2) {
+		let x = Math.max(particle1.id, particle2.id);
+		let y = Math.min(particle1.id, particle2.id);
+
+		if (this.effectivePotentialMaxes.length <= x) {
+			let originalLength = this.effectivePotentialMaxes.length;
+			this.effectivePotentialMaxes.length = x+1;
+			this.effectivePotentialMaxes.fill([-Number.MAX_VALUE], originalLength);
+		}
+
+		if (this.effectivePotentialMaxes[x].length <= y) {
+			let originalLength = this.effectivePotentialMaxes[x].length;
+			this.effectivePotentialMaxes[x].length = y+1;
+			this.effectivePotentialMaxes[x].fill(-Number.MAX_VALUE, originalLength);
+		}
+		this.effectivePotentialMaxes[x][y] = Math.max(this.effectivePotentialMaxes[x][y], this.calculateEffectivePotential(particle1, particle2));
+		return this.effectivePotentialMaxes[x][y];
+	},
+
+	calculateEccentricity: function(particle1, particle2) {
+		let bigE = this.calculateEffectivePotentialMax(particle1, particle2);
+		if (bigE >= 0) return -1;
+
+		let r = Math.abs(particle1.position.subtract(particle2.position).magnitude());
+		let smallM = Math.min(particle1.mass, particle2.mass);
+		let bigM = Math.max(particle1.mass, particle2.mass);
+		let mu = (smallM * bigM)/(smallM + bigM);
+		let v = particle1.velocity.subtract(particle2.velocity).magnitude();
+		const bigG = 6.6743e-11;
+		let l = r * smallM * v;
+
+		return Math.sqrt(1 + ((2 * bigE * l * l) / (mu * (bigG * smallM * bigM)**2)))
+	},
+
+	// accidentally finds apsides instead of semi major/minor axes
+	calculateOrbitLengths: function(particle1, particle2) {
+		let bigE = this.calculateEffectivePotentialMax(particle1, particle2);
+		if (bigE >= 0) return {apside1: null, apside2: null};
+
+		let r = Math.abs(particle1.position.subtract(particle2.position).magnitude());
+		let e = this.calculateEccentricity(particle1, particle2);
+		let smallM = Math.min(particle1.mass, particle2.mass);
+		let bigM = Math.max(particle1.mass, particle2.mass);
+		let v = particle1.velocity.subtract(particle2.velocity).magnitude();
+		let mu = (smallM * bigM)/(smallM + bigM);
+		const bigG = 6.6743e-11;
+		let l = r * smallM * v;
+
+		// let r0 = (l * l)/(bigG * bigM * mu * smallM);
+		let r0 = -(bigG * smallM * bigM * (1 - e*e))/(2 * bigE)
+
+		return {apside1: r0/(1-e), apside2: r0/(1+e)};
 	}
 }
 
@@ -107,18 +154,72 @@ newHeavyParticleButton.addEventListener("click", () => {
 const sunMass = 1.988435e30
 const sunRadius = 6.957e8
 
-const mercuryMass = 3.301e23
-const mercuryDist = 6.7828e10
-const mercurySpeed = 47400
-const mercuryRadius = 2.44e6
+const mercury = {
+	mass: 3.301e23,
+	perihelion: 46e9,
+	aphelion: 69.818e9,
+	minSpeed: 38860,
+	maxSpeed: 58970,
+	radius: 2438300
+}
 
-const venusMass = 4.867e24
-const venusDist = 1.0892e11
-const venusSpeed = 35000
-const venusRadius = 6.05e6
+const venus = {
+	mass: 4.8673e24, 
+	perihelion: 107.48e9,
+	aphelion: 108.941e9,
+	minSpeed: 34780,
+	maxSpeed: 35260,
+	radius: 6051800
+};
+
+const earth = {
+	mass: 5.972168e24,
+	perihelion: 147.095e9,
+	aphelion: 152.100e9,
+	minSpeed: 29290,
+	maxSpeed: 30290,
+	radius: 6371
+};
+
+const moon = {
+	mass: 7.346e22,
+	perigee: 3.6338e8,
+	apogee: 4.055e8,
+	minSpeed: 979,
+	maxSpeed: 1082,
+	radius: 272.7
+};
+
+const mars = {
+	mass: 6.4169e23,
+	perihelion: 206.65e9,
+	aphelion: 249.261e9,
+	minSpeed: 21970,
+	maxSpeed: 26500,
+	radius: 3389.5
+}
+
+const jupiter = {
+	mass: 1898.13e24, 
+	perihelion: 740.595e9,
+	aphelion: 816.363e9,
+	minSpeed: 12440,
+	maxSpeed: 13720,
+	radius: 69911000
+}
+
+const saturn = {
+	mass: 568.32e24,
+	perihelion: 1357.554e9, 
+	aphelion: 1506.527e9,
+	minSpeed: 9140,
+	maxSpeed: 10140,
+	radius: 58232000
+}
 
 const earthMass = 5.972168e24
 const earthDist = 1.4961877e11
+const AU = earthDist
 const earthSpeed = 29800
 const earthRadius = 6.371009e6
 
@@ -169,12 +270,19 @@ const plutoRadius = 1.1899e6
 
 engine.newParticle(0, 0, sunMass, sunRadius, {x:0, y:0}, "yellow")
 
-// engine.newParticle(mercuryDist, 0, mercuryMass, 0, {x:0, y:mercurySpeed}, "silver");
-// engine.newParticle(venusDist, 0, venusMass, 0, {x:0, y:venusSpeed}, "purple");
-//engine.newParticle(earthDist, 0, earthMass, 0, {x:0, y:earthSpeed}, "blue");
+engine.newParticle(mercury.perihelion, 0, mercury.mass, mercury.radius, {x:0, y:mercury.maxSpeed}, "silver");
+engine.newParticle(venus.perihelion, 0, venus.mass, venus.radius, {x:0, y:venus.maxSpeed}, "purple");
+engine.newParticle(moon.perigee + earth.perihelion, 0, moon.mass, moon.radius, {x:0, y:moon.maxSpeed + earth.maxSpeed}, "gray");
+engine.newParticle(earth.perihelion, 0, earth.mass, earth.radius, {x:0, y:earth.maxSpeed}, "blue");
+engine.newParticle(mars.perihelion, 0, mars.mass, mars.radius, {x:0, y:mars.maxSpeed}, "red");
+
+engine.newParticle(jupiter.perihelion, 0, jupiter.mass, jupiter.radius, {x:0, y:jupiter.maxSpeed}, "orange");
+engine.newParticle(saturn.perihelion, 0, saturn.mass, saturn.radius, {x:0, y:saturn.maxSpeed}, "beige");
+
+// engine.newParticle(earthDist, 0, earthMass, 0, {x:0, y:earthSpeed}, "blue");
 // engine.newParticle(earthDist + moonDist, 0, moonMass, 0, {x:0, y:earthSpeed + moonSpeed}, "gray");
 // engine.newParticle(marsDist, 0, marsMass, 0, {x:0, y:marsSpeed}, "red");
-
+// 
 // engine.newParticle(jupiterDist, 0, jupiterMass, 0, {x:0, y:jupiterSpeed}, "orange");
 // engine.newParticle(saturnDist, 0, saturnMass, 0, {x:0, y:saturnSpeed}, "beige");
 // engine.newParticle(uranusDist, 0, uranusMass, 0, {x:0, y:uranusSpeed}, "cyan");
@@ -188,19 +296,11 @@ function randomInt(min, max) {
 }
 
 // for (let i = 0; i < 100; i++) {
-// 	let p = {x: randomInt(-100, 100), y: randomInt(-100, 100)}
-// 	let v = {x: 2*(Math.random() - 0.5), y: 2*(Math.random() - 0.5)}
-// 	let m = randomInt(1, 10)
-// 	let r = Math.sqrt(m)
-// 	engine.newParticle(p.x, p.y, m, r, {x: v.x, y: v.y}, "blue");
+// 	let p = {x: randomInt(-AU, AU), y: randomInt(-AU, AU)}
+// 	let v = {x: randomInt(-3000, 3000), y: randomInt(-3000, 3000)}
+// 	let m = randomInt(plutoMass, earthMass)
+// 	let r = Math.sqrt(m / Math.PI / 100000)
+// 	engine.newParticle(p.x, p.y, m, r, v, "blue");
 // }
-
-for (let i = 0; i < 100; i++) {
-	let p = {x: randomInt(-plutoDist, plutoDist), y: randomInt(-plutoDist, plutoDist)}
-	let v = {x: randomInt(-plutoSpeed/100, plutoSpeed/100), y: randomInt(-plutoSpeed/100, plutoSpeed/100)}
-	let m = randomInt(plutoMass/100, plutoMass)
-	let r = plutoRadius
-	engine.newParticle(p.x, p.y, m, 100*r, {x: v.x, y: v.y}, "white");
-}
 
 export { engine };
