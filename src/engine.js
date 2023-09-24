@@ -74,6 +74,7 @@ let engine = {
 	},
 
 	// https://phys.libretexts.org/Bookshelves/Classical_Mechanics/Classical_Mechanics_(Dourmashkin)/25%3A_Celestial_Mechanics/25.04%3A_Energy_Diagram_Effective_Potential_Energy_and_Orbits
+	// https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/mit8_01scs22_chapter25new.pdf
 	calculateEffectivePotential: function(particle1, particle2) {
 		let r = Math.abs(particle1.position.subtract(particle2.position).magnitude());
 		let smallM = Math.min(particle1.mass, particle2.mass);
@@ -117,7 +118,12 @@ let engine = {
 		let mu = (smallM * bigM)/(smallM + bigM);
 		let v = particle1.velocity.subtract(particle2.velocity).magnitude();
 		const bigG = 6.6743e-11;
-		let l = r * smallM * v;
+		// let l  = r * Math.min(particle1.mass, particle2.mass) * v;
+		let l = smallM * particle1.position.subtract(particle2.position).crossMagnitude(particle1.velocity.subtract(particle2.velocity))
+		// console.log(l)
+		console.log(l)
+
+		// let l = 9e38
 
 		return Math.sqrt(1 + ((2 * bigE * l * l) / (mu * (bigG * smallM * bigM)**2)))
 	},
@@ -135,6 +141,9 @@ let engine = {
 		let mu = (smallM * bigM)/(smallM + bigM);
 		const bigG = 6.6743e-11;
 		let l = r * smallM * v;
+
+		if (e == 1) return {apside1: particle1.position.subtract(particle2.position).magnitude(),
+							apside2: particle1.position.subtract(particle2.position).magnitude()}
 
 		// let r0 = (l * l)/(bigG * bigM * mu * smallM);
 		let r0 = -(bigG * smallM * bigM * (1 - e*e))/(2 * bigE)
@@ -279,16 +288,6 @@ engine.newParticle(mars.perihelion, 0, mars.mass, mars.radius, {x:0, y:mars.maxS
 engine.newParticle(jupiter.perihelion, 0, jupiter.mass, jupiter.radius, {x:0, y:jupiter.maxSpeed}, "orange");
 engine.newParticle(saturn.perihelion, 0, saturn.mass, saturn.radius, {x:0, y:saturn.maxSpeed}, "beige");
 
-// engine.newParticle(earthDist, 0, earthMass, 0, {x:0, y:earthSpeed}, "blue");
-// engine.newParticle(earthDist + moonDist, 0, moonMass, 0, {x:0, y:earthSpeed + moonSpeed}, "gray");
-// engine.newParticle(marsDist, 0, marsMass, 0, {x:0, y:marsSpeed}, "red");
-// 
-// engine.newParticle(jupiterDist, 0, jupiterMass, 0, {x:0, y:jupiterSpeed}, "orange");
-// engine.newParticle(saturnDist, 0, saturnMass, 0, {x:0, y:saturnSpeed}, "beige");
-// engine.newParticle(uranusDist, 0, uranusMass, 0, {x:0, y:uranusSpeed}, "cyan");
-// engine.newParticle(neptuneDist, 0, neptuneMass, 0, {x:0, y:neptuneSpeed}, "blue");
-// 
-// engine.newParticle(plutoDist, 0, plutoMass, 0, {x:0, y:plutoSpeed}, "brown");
 
 // inclusive
 function randomInt(min, max) {

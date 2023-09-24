@@ -48,11 +48,14 @@ function drawOrbit(particle1, particle2, color, alpha = 1) {
 
 	let a = (ap1 + ap2) / 2;
 	let b = Math.sqrt(ap1 * ap2);
-	let c = f.addScalar(-Math.sqrt(a*a - b*b));
+	let c = Math.sqrt(a*a - b*b);
+
+	let center = new Vector(f.x - c, f.y);
+	let theta = particle1.position.angleBetween(particle2.position);
 
 	ctx.strokeStyle = color;
 	ctx.beginPath()
-	ctx.ellipse(hActualToPixel(c.x), vActualToPixel(c.y), Math.abs(hActualToPixel(a) - hActualToPixel(0)), Math.abs(vActualToPixel(b)-vActualToPixel(0)), -particle1.position.angleBetween(particle2.position), 0, 2*Math.PI)
+	ctx.ellipse(hActualToPixel(center.x), vActualToPixel(center.y), Math.abs(hActualToPixel(a) - hActualToPixel(0)), Math.abs(vActualToPixel(b)-vActualToPixel(0)), 0, 0, 2*Math.PI)
 	ctx.stroke();
 }
 
@@ -242,7 +245,7 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("keyup", (e) => {
 	if (!e.shiftKey) shiftKeyDown = false;
 })
-
+let am, nam;
 // takes in a State object to determine what to render
 function renderFrame(frame) {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -268,6 +271,18 @@ function renderFrame(frame) {
 	drawOrbit(engine.particles[0], engine.particles[6], "white");
 	drawOrbit(engine.particles[0], engine.particles[7], "white");
 	drawOrbit(engine.particles[3], engine.particles[4], "yellow");
+
+	// drawOrbit(engine.particles[1], engine.particles[0], "blue");
+	console.log({
+		ep: engine.calculateEffectivePotentialMax(engine.particles[0], engine.particles[1]),
+		ec: engine.calculateEccentricity(engine.particles[1], engine.particles[0]),
+	})
+
+	// nam = Math.abs(engine.particles[0].position.subtract(engine.particles[1].position).magnitude()) * engine.particles[1].mass * engine.particles[1].velocity.subtract(engine.particles[0].velocity).magnitude()
+	// console.log(nam)
+	// console.log(100 * (nam - am) / am)
+	// am = Math.abs(engine.particles[0].position.subtract(engine.particles[1].position).magnitude()) * engine.particles[1].mass * engine.particles[1].velocity.subtract(engine.particles[0].velocity).magnitude()
+
 
 	//drawOrbit(engine.particles[0], engine.particles[8], "white");
 	//drawOrbit(engine.particles[0], engine.particles[9], "white");

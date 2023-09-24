@@ -20,6 +20,10 @@ export class Vector {
 		return this.x * vector.x + this.y * vector.y; 
 	}
 
+	crossMagnitude(vector) {
+		return this.x * vector.y - this.y * vector.x;
+	}
+
 	magnitude() {
 		return Math.sqrt(this.x*this.x + this.y*this.y);
 	}
