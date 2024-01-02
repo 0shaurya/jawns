@@ -10,7 +10,7 @@ p {
 .container {
 	display: grid;
 	grid-template-columns: 10% 1024px 1fr;
-	grid-template-rows: 10% 576px 1fr;
+	grid-template-rows: 15% 576px 1fr;
 	grid-template-areas:
 		"top-toolbar top-toolbar properties-tab"
 		"left-toolbar simulation properties-tab"

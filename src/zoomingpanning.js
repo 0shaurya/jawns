@@ -2,7 +2,7 @@ import { hPixelToActual, hActualToPixel, vPixelToActual, vActualToPixel } from '
 import { engine } from './engine.js';
 
 //let scale = 1;
-let scale = .000000000002;
+let scale = .00000000007;
 let translateX = 0;
 let translateY = 0;
 
@@ -88,5 +88,5 @@ function printMousePositionAndScale(e) {
     	y: (-(e.clientY - rect.top)+288 + translateY)/32 / scale
     };
     document.getElementById("mousePosition").textContent = `(${Math.round(mousePosition.x*1000)/1000}, ${Math.round(mousePosition.y*1000)/1000})`;
-    document.getElementById("zoomFactor").textContent = `Zoom: ${Math.round(scale*100)/100}x`;
+    document.getElementById("zoomFactor").textContent = `Zoom: ${Math.round(scale*1000000000000)/1000000000000}x`;
 }

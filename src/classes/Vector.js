@@ -20,7 +20,8 @@ export class Vector {
 		return this.x * vector.x + this.y * vector.y; 
 	}
 
-	crossMagnitude(vector) {
+	// calculates the k value of the cross product of this x arg
+	crossK(vector) {
 		return this.x * vector.y - this.y * vector.x;
 	}
 
@@ -30,6 +31,12 @@ export class Vector {
 
 	addScalar(scalar) {
 		return this.scale((this.magnitude() + scalar) / this.magnitude());
+	}
+
+	// add in magnitude/direction form
+	addMagnitudeDirection(magnitude, direction) {
+		let vec2 = new Vector(magnitude * Math.cos(direction), magnitude * Math.sin(direction))
+		return this.add(vec2)
 	}
 
 	normalize() {

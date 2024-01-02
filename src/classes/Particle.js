@@ -7,8 +7,9 @@ export class Particle {
 	// Number y
 	// Number radius
 	// initialVelocity = { x, y }
-	constructor(id, x, y, mass, radius, initialVelocity = { x: 0, y: 0 }, isBolted = false, isDeleted = false, color, isFollowing = false) {
+	constructor(id, name, x, y, mass, radius, initialVelocity = { x: 0, y: 0 }, isBolted = false, isDeleted = false, color, isFollowing = false) {
 		this.id = id;
+		this.name = name;
 		this.position = new Vector(x, y);
 		this.velocity = new Vector(initialVelocity.x, initialVelocity.y);
 		this.acceleration = new Vector(0, 0);
@@ -77,8 +78,8 @@ export class Particle {
 		// updates velocity
 		this.newVelocity = this.velocity.add(this.acceleration.add(this.newAcceleration).scale(dt*0.5));
 
-		this.position.x = this.newPosition.x;
-		this.position.y = this.newPosition.y;
+		if (!this.isBolted) this.position.x = this.newPosition.x;
+		if (!this.isBolted) this.position.y = this.newPosition.y;
 		this.velocity.x = this.newVelocity.x;
 		this.velocity.y = this.newVelocity.y;
 		this.acceleration.x = this.newAcceleration.x;

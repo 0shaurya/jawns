@@ -21,22 +21,19 @@
 		<p id = "time">time:</p>
 		<button id = "gridlines">Gridlines on/off</button>
 		<button id = "gravField">Gravitational Field on/off</button>
-		Speed: <input type = "text" id = "timeSpeed" value = "10d" size = "5"></input>
+		Speed: <input type = "text" id = "timeSpeed" value = "1d" size = "5"></input>
 		Step: <input type = "text" id = "timeStep" value = "1s" size = "5"></input>
 		<br>
 		<p id = "fps">FPS: </p>
 		<p id = "frametime">Frametime:</p>
 		<p id = "actualSimSpeed">Actual Sim Speed:</p>
-		<!-- Top Toolbar -->
-		<!-- Add your toolbar elements here -->
+		<p style = "color:red">Hold shift to see all particles, hold shift and hover over a particle to see info about it. Press 'Pause/Play' at bottom to start.</p>
 	</div>
 
 	<div class="left-toolbar">
 		<p>Mouse Position:</p>
 		<p id = "mousePosition"></p><br>
 		<p id = "zoomFactor"></p>
-		<!-- Left Toolbar -->
-		<!-- Add your toolbar elements here -->
 	</div>
 
 	<div class="properties-tab" style="line-height:1.5; padding-left:5px">
@@ -48,8 +45,6 @@
 		<p id = "renderingTime"></p>
 		<br><br><br><br>
 		<div id = "effectivePotentials" style="color:white"></div>
-		<!-- Properties Tab -->
-		<!-- Add your properties elements here -->
 	</div>
 
 	<div class="simulation">
@@ -59,28 +54,21 @@
 	<div class="time-slider">
 		<button id="reset">Reset time</button>
 		<button id="pauseplay">Pause/Play</button>
-		<button id="seek">Seek previous time</button>
-		<!-- Time Slider -->
-		<!-- Add your time slider element here -->
+		<!-- <button id="seek">Seek previous time</button> -->
 	</div> 
 </div>
 
 <div id="contextMenu">
 	<div id="newParticleContextMenuButton">
-		<span>New Particle</span>
+		<span>New Particle (Earth mass)</span>
 	</div>
 	<div id="newHeavyParticleContextMenuButton">
-		<span>New Heavy Particle</span>
-	</div>
-	<div id="">
-		<span>·</span>
-	</div>
-	<div id="">
-		<span>·</span>
+		<span>New Heavy Particle (Sun mass)</span>
 	</div>
 </div>
 
 <div id="entityInfo">
+	<p id="entityName"></p>
 	<p id="entityType"></p>
 	<p id="entityMass"></p>
 	<p id="entityRadius"></p>
@@ -96,12 +84,12 @@
 	<div id="boltParticleRightClickButton">
 		<span>Bolt Particle</span>
 	</div>
-	<div id="trackParticleRightClickButton">
+<!-- 	<div id="trackParticleRightClickButton">
 		<span>Track Particle</span>
 	</div>
 	<div id="traceParticleRightClickButton">
 		<span>Trace Particle</span>
-	</div>
+	</div> -->
 	<div id="followParticleRightClickButton">
 		<span>Follow Particle</span>
 	</div>

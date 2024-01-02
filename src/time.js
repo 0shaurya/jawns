@@ -95,12 +95,12 @@ function update() {
 		}
 
 		let updatingPhysicsTime = performance.now() - updatingPhysicsStart;
-		document.getElementById("updatingPhysicsTime").textContent = `___Updating Physics Time: ${updatingPhysicsTime} ms`;
+		document.getElementById("updatingPhysicsTime").textContent = `Updating Physics Time: ${Math.round(updatingPhysicsTime*100)/100} ms`;
 		
 		let collisionsStart = performance.now();
 		engine.calculateCollisions();
 		let collisionsTime = performance.now() - collisionsStart;
-		document.getElementById("collisionsTime").textContent = `___Calculating Collisions Time: ${collisionsTime} ms`;
+		document.getElementById("collisionsTime").textContent = `Calculating Collisions Time: ${Math.round(collisionsTime*100)/100} ms`;
 
 		let updatingValsStart = performance.now();
 		engine.particles.forEach((item, index) => {
@@ -110,71 +110,38 @@ function update() {
 		});
 
 		let updatingValsTime = performance.now() - updatingValsStart;
-		document.getElementById("updatingValsTime").textContent = `___Updating Values Time: ${updatingValsTime} ms`;
-
-		let sun = engine.particles[0]
-		let mercury = engine.particles[1]
-
-		//document.getElementById("effectivePotentials").innerHTML = JSON.stringify({
-		//	mercurySun: engine.calculateEccentricity(engine.particles[0], engine.particles[1]),
-		//	earthSun: engine.calculateEccentricity(engine.particles[0], engine.particles[3]),
-		//	moonSun: engine.calculateEccentricity(engine.particles[0], engine.particles[4]),
-		//	earthMoon: engine.calculateEccentricity(engine.particles[4], engine.particles[3]),
-		//	moonJupiter: engine.calculateEccentricity(engine.particles[4], engine.particles[6]),
-		//	venusNeptune: engine.calculateEccentricity(engine.particles[2], engine.particles[9]),
-		//	sunNeptune: engine.calculateEccentricity(engine.particles[0], engine.particles[9])
-		//})
-
-		// let hasParticles = false;
-		// particlePerformanceArray.forEach((item, index) => {
-		// 	if (item.numOfParticles === engine.getNumOfParticles()) {
-		// 		hasParticles = true;
-		// 	}
-		// })
-		// 
-		// if (!hasParticles) {
-		// 	particlePerformanceArray.push({
-		// 		numOfParticles: engine.getNumOfParticles(),
-		// 		updatingPhysicsTime: updatingPhysicsTime,
-		// 		collisionsTime: collisionsTime,
-		// 		updatingValsTime: updatingValsTime,
-		// 		totalTime: updatingPhysicsTime + collisionsTime + updatingValsTime
-		// 	})	
-		// }
-
+		document.getElementById("updatingValsTime").textContent = `Updating Values Time: ${Math.round(updatingValsTime*100)/100} ms`;
 
 	}
-	// console.log(particlePerformanceArray);
-
 	return nextFrame;
 }
 
 // renders a new frame every 1/60th seconds
 function step() {
-
 	frameTimeEnd = performance.now();
+
 	document.getElementById("fps").textContent = "FPS: " + Math.round(Math.min(1000/(frameTimeEnd - frameTimeStart), 60));
-	document.getElementById("frametime").textContent = "Frametime: " + (frameTimeEnd - frameTimeStart) + "ms";
+	document.getElementById("frametime").textContent = "Frametime: " + (Math.round((frameTimeEnd - frameTimeStart)*100)/100) + "ms";
 	document.getElementById("actualSimSpeed").textContent = "Actual Sim Speed: " + timeToString(Math.min(1000/(frameTimeEnd - frameTimeStart), 60)/60 * timeSpeed);
 	let tempFrameTimeStart = frameTimeStart;
 	frameTimeStart = performance.now();   
 	
 	let updateFollowingStart = performance.now();
 	updateFollowing();
-	document.getElementById("followingTime").textContent = "Updating Following Time: " + (performance.now() -  updateFollowingStart) + "ms";
+	document.getElementById("followingTime").textContent = "Updating Following Time: " + (Math.round((performance.now() -  updateFollowingStart)*100)/100) + "ms";
 
 	let nextFrameStart = performance.now();
 	let nextFrame = update();
-	document.getElementById("updatingTime").textContent = "Total Updating Time: " + (performance.now() -  nextFrameStart) + "ms";
+	document.getElementById("updatingTime").textContent = "Total Updating Time: " + (Math.round((performance.now() -  nextFrameStart)*100)/100) + "ms";
 
 	if (isTimeMoving) {
 		document.getElementById("time").textContent = `time: ${timeToString(time)}`;
-		time += timeSpeed * Math.min((frameTimeEnd - tempFrameTimeStart)/1000, 1/60)
+		time += timeSpeed * 1/60
 	}
 
 	let renderingTimeStart = performance.now();
 	renderFrame(nextFrame);
-	document.getElementById("renderingTime").textContent = "Rendering Time: " + (performance.now() - renderingTimeStart) + "ms";
+	document.getElementById("renderingTime").textContent = "Rendering Time: " + (Math.round((performance.now() - renderingTimeStart)*100)/100) + "ms";
 
 	window.requestAnimationFrame(step);
 }
@@ -213,7 +180,7 @@ function seek() {
 
 document.getElementById("reset").addEventListener("click", reset);
 document.getElementById("pauseplay").addEventListener("click", pauseplay);
-document.getElementById("seek").addEventListener("click", seek);
+// document.getElementById("seek").addEventListener("click", seek);
 
 setTimeout(step(), 100);
 

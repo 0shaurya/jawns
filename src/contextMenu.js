@@ -7,6 +7,7 @@ const canvas = document.getElementById('canv');
 let contextMenu = document.getElementById("contextMenu");
 let entityContextMenu = document.getElementById("entityContextMenu")
 let entityInfo = document.getElementById('entityInfo');
+let entityName = document.getElementById('entityName');
 let entityMass = document.getElementById('entityMass');
 let entityRadius = document.getElementById('entityRadius');
 let entityType = document.getElementById('entityType');
@@ -16,8 +17,8 @@ let entityAcceleration = document.getElementById('entityAcceleration');
 
 let deleteParticleRightClickButton = document.getElementById('deleteParticleRightClickButton');
 let boltParticleRightClickButton = document.getElementById('boltParticleRightClickButton');
-let trackParticleRightClickButton = document.getElementById('trackParticleRightClickButton');
-let traceParticleRightClickButton = document.getElementById('traceParticleRightClickButton');
+// let trackParticleRightClickButton = document.getElementById('trackParticleRightClickButton');
+// let traceParticleRightClickButton = document.getElementById('traceParticleRightClickButton');
 let followParticleRightClickButton = document.getElementById('followParticleRightClickButton');
 
 let currentContextMenuItem;
@@ -74,16 +75,16 @@ boltParticleRightClickButton.addEventListener("click", (e) => {
 		currentContextMenuItem.toggleBolted();
 	}
 })
-trackParticleRightClickButton.addEventListener("click", (e) => {
-	if (entityContextMenu.style.visibility === "visible") {
-		hideAllMenus();
-	}
-})
-traceParticleRightClickButton.addEventListener("click", (e) => {
-	if (entityContextMenu.style.visibility === "visible") {
-		hideAllMenus();
-	}
-})
+// trackParticleRightClickButton.addEventListener("click", (e) => {
+	// if (entityContextMenu.style.visibility === "visible") {
+		// hideAllMenus();
+	// }
+// })
+// traceParticleRightClickButton.addEventListener("click", (e) => {
+	// if (entityContextMenu.style.visibility === "visible") {
+		// hideAllMenus();
+	// }
+// })
 followParticleRightClickButton.addEventListener("click", (e) => {
 	if (entityContextMenu.style.visibility === "visible") {
 		hideAllMenus();
@@ -110,7 +111,7 @@ document.body.addEventListener('keydown', (e) => {
 				entityInfo.style.visibility = 'visible';
 				document.body.style.cursor = "default";
 
-				entityType.textContent = item.isBolted ? "Particle (" + item.id + ")" + " (Bolted)" : "Particle (" + item.id + ")";
+				entityType.textContent = item.isBolted ? item.name + " (" + item.id + ")" + " (Bolted)" : item.name + " (" + item.id + ")";
 				entityMass.textContent = "mass: " + item.mass;
 				entityRadius.textContent = "radius: " + item.radius;
 				entityPosition.textContent     = "p: " + getPosition(item);

@@ -33,29 +33,61 @@ function drawBall(x, y, r, color, alpha = 1) {
 	ctx.stroke();
 }
 
-function drawOrbit(particle1, particle2, color, alpha = 1) {
-	let f;
+function rotatedEllipsePolar(theta, a, e, phi) {
+	return Math.abs(a*(1 - e*e) / (1 + e*(Math.cos(theta - phi))));
+}
 
+function drawOrbit(particle1, particle2, color, alpha = 1) {
+	let focus;
 	if (particle1.mass > particle2.mass) {
-		f = new Vector(particle1.position.x, particle1.position.y);
+		focus = new Vector(particle1.position.x, particle1.position.y);
 	} else {
-		f = new Vector(particle2.position.x, particle2.position.y);
+		focus = new Vector(particle2.position.x, particle2.position.y);
 	}
 
+	let lengths = engine.calculateOrbitLengths(particle1, particle2);
+	let r = particle2.position.subtract(particle1.position);
+	let theta = r.angle();
+	if (theta < 0) {
+		theta = 2*Math.PI + theta
+	}
 
-	let ap1 = engine.calculateOrbitLengths(particle1, particle2).apside1;
-	let ap2 = engine.calculateOrbitLengths(particle1, particle2).apside2;
+	let a = lengths.semiMajor
+	let e = lengths.eccentricity
+	let rMag = r.magnitude()
+	
+	// calculate the two possible phi values based on the polar equation of a rotated ellipse
+	let phiP = theta + Math.acos((a*(1 - e*e) - rMag) / (e * rMag))
+	let phiM = theta - Math.acos((a*(1 - e*e) - rMag) / (e * rMag))
 
-	let a = (ap1 + ap2) / 2;
-	let b = Math.sqrt(ap1 * ap2);
-	let c = Math.sqrt(a*a - b*b);
+	// figure out whether the positive or negative phi value is correct
+	let phi;
+	if (r.crossK(particle2.velocity) < 0 ) {
+		if ( r.dot(particle2.velocity) > 0 ) {
+			phi = (Math.PI + phiP) % (2*Math.PI)
+		} else {
+			phi = (Math.PI + phiM) % (2*Math.PI)
+		}
+	} else {
+		if ( r.dot(particle2.velocity) < 0 ) {
+			phi = (Math.PI + phiP) % (2*Math.PI)
+		} else {
+			phi = (Math.PI + phiM) % (2*Math.PI)
+		}
+	}
 
-	let center = new Vector(f.x - c, f.y);
-	let theta = particle1.position.angleBetween(particle2.position);
-
+	let center = new Vector(focus.x + lengths.c*Math.cos(phi),
+							focus.y + lengths.c*Math.sin(phi));
+	if (particle2.name == "Moon") console.log(phi)
 	ctx.strokeStyle = color;
 	ctx.beginPath()
-	ctx.ellipse(hActualToPixel(center.x), vActualToPixel(center.y), Math.abs(hActualToPixel(a) - hActualToPixel(0)), Math.abs(vActualToPixel(b)-vActualToPixel(0)), 0, 0, 2*Math.PI)
+	ctx.ellipse(hActualToPixel(center.x), // center x
+				vActualToPixel(center.y), // center y
+				Math.abs(hActualToPixel(lengths.semiMajor) - hActualToPixel(0)), // radius x
+				Math.abs(vActualToPixel(lengths.semiMinor) - vActualToPixel(0)), // radius y
+				-phi, // rotation
+				0,
+				2*Math.PI)
 	ctx.stroke();
 }
 
@@ -245,7 +277,9 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("keyup", (e) => {
 	if (!e.shiftKey) shiftKeyDown = false;
 })
-let am, nam;
+
+let stateHistory = []
+
 // takes in a State object to determine what to render
 function renderFrame(frame) {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -264,35 +298,14 @@ function renderFrame(frame) {
 		});
 	}
 
-	drawOrbit(engine.particles[0], engine.particles[1], "white");
-	drawOrbit(engine.particles[0], engine.particles[2], "white");
-	drawOrbit(engine.particles[0], engine.particles[4], "red");
-	drawOrbit(engine.particles[0], engine.particles[5], "white");
-	drawOrbit(engine.particles[0], engine.particles[6], "white");
-	drawOrbit(engine.particles[0], engine.particles[7], "white");
-	drawOrbit(engine.particles[3], engine.particles[4], "yellow");
-
-	// drawOrbit(engine.particles[1], engine.particles[0], "blue");
-	console.log({
-		ep: engine.calculateEffectivePotentialMax(engine.particles[0], engine.particles[1]),
-		ec: engine.calculateEccentricity(engine.particles[1], engine.particles[0]),
+	engine.particles.forEach((item, index) => {
+		if (index !== 0 && index !== 3) {
+			drawOrbit(engine.particles[0], engine.particles[index], "white")
+		}
 	})
 
-	// nam = Math.abs(engine.particles[0].position.subtract(engine.particles[1].position).magnitude()) * engine.particles[1].mass * engine.particles[1].velocity.subtract(engine.particles[0].velocity).magnitude()
-	// console.log(nam)
-	// console.log(100 * (nam - am) / am)
-	// am = Math.abs(engine.particles[0].position.subtract(engine.particles[1].position).magnitude()) * engine.particles[1].mass * engine.particles[1].velocity.subtract(engine.particles[0].velocity).magnitude()
-
-
-	//drawOrbit(engine.particles[0], engine.particles[8], "white");
-	//drawOrbit(engine.particles[0], engine.particles[9], "white");
-	//drawOrbit(engine.particles[0], engine.particles[10], "white");
-	//drawOrbit(engine.particles[3], engine.particles[4], "red");
 
 	if (gridlinesOn) drawGridNumbers();
-
-	let dx = 0;
-	let dy = 0;
 }
 
 export { gridStep };

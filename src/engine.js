@@ -20,9 +20,10 @@ let newHeavyParticleButton = document.getElementById("newHeavyParticleContextMen
 let engine = {
 	particles: [],
 
-	newParticle: function(x, y, mass, radius, initialVelocity, color) {
+	newParticle: function(name, x, y, mass, radius, initialVelocity, color) {
 		this.particles.push(new Particle(
 			this.particles.length,
+			name,
 			x,
 			y,
 			mass,
@@ -119,16 +120,14 @@ let engine = {
 		let v = particle1.velocity.subtract(particle2.velocity).magnitude();
 		const bigG = 6.6743e-11;
 		// let l  = r * Math.min(particle1.mass, particle2.mass) * v;
-		let l = smallM * particle1.position.subtract(particle2.position).crossMagnitude(particle1.velocity.subtract(particle2.velocity))
+		let l = smallM * particle1.position.subtract(particle2.position).crossK(particle1.velocity.subtract(particle2.velocity))
 		// console.log(l)
-		console.log(l)
 
 		// let l = 9e38
 
 		return Math.sqrt(1 + ((2 * bigE * l * l) / (mu * (bigG * smallM * bigM)**2)))
 	},
 
-	// accidentally finds apsides instead of semi major/minor axes
 	calculateOrbitLengths: function(particle1, particle2) {
 		let bigE = this.calculateEffectivePotentialMax(particle1, particle2);
 		if (bigE >= 0) return {apside1: null, apside2: null};
@@ -140,24 +139,34 @@ let engine = {
 		let v = particle1.velocity.subtract(particle2.velocity).magnitude();
 		let mu = (smallM * bigM)/(smallM + bigM);
 		const bigG = 6.6743e-11;
-		let l = r * smallM * v;
+		let l = smallM * particle1.position.subtract(particle2.position).crossK(particle1.velocity.subtract(particle2.velocity))
 
 		if (e == 1) return {apside1: particle1.position.subtract(particle2.position).magnitude(),
 							apside2: particle1.position.subtract(particle2.position).magnitude()}
 
 		// let r0 = (l * l)/(bigG * bigM * mu * smallM);
 		let r0 = -(bigG * smallM * bigM * (1 - e*e))/(2 * bigE)
+		let a1 = r0/(1-e);
+		let a2 = r0/(1+e);
+		let semiMajor = (a1 + a2)/2
+		let semiMinor = Math.sqrt(a1 * a2)
+		let c = Math.sqrt(semiMajor * semiMajor - semiMinor * semiMinor) // c is the distance from the center to a focus
 
-		return {apside1: r0/(1-e), apside2: r0/(1+e)};
+		return {apside1: a1, apside2: a2, semiMajor: semiMajor, semiMinor: semiMinor, c: c, eccentricity: e};
+	},
+
+	calculateMeanAnomaly: function(particle1, particle2) {
+		//let eccentricAnomaly = Math.acos()
+		//let e = this.calculateEccentricity(particle1, particle2);
 	}
 }
 
 newParticleButton.addEventListener("click", () => {
-	engine.newParticle(hPixelToActual(contextMenuCoords.x), vPixelToActual(contextMenuCoords.y), 1, 0, {x:0, y:0});
+	engine.newParticle("Particle", hPixelToActual(contextMenuCoords.x), vPixelToActual(contextMenuCoords.y), 5.972168e24, 0, {x:0, y:0});
 });
 
 newHeavyParticleButton.addEventListener("click", () => {
-	engine.newParticle(hPixelToActual(contextMenuCoords.x), vPixelToActual(contextMenuCoords.y), 100, 0, {x:0, y:0});
+	engine.newParticle("Particle", hPixelToActual(contextMenuCoords.x), vPixelToActual(contextMenuCoords.y), 1.988435e30, 0, {x:0, y:0});
 })
 
 const sunMass = 1.988435e30
@@ -226,6 +235,15 @@ const saturn = {
 	radius: 58232000
 }
 
+const uranus = {
+	mass: 568.32e24,
+	perihelion: 1357.554e9, 
+	aphelion: 1506.527e9,
+	minSpeed: 9140,
+	maxSpeed: 10140,
+	radius: 58232000
+}
+
 const earthMass = 5.972168e24
 const earthDist = 1.4961877e11
 const AU = earthDist
@@ -277,16 +295,16 @@ const plutoSpeed = 5365
 const plutoRadius = 1.1899e6
 
 
-engine.newParticle(0, 0, sunMass, sunRadius, {x:0, y:0}, "yellow")
+engine.newParticle("Sun", 0, 0, sunMass, sunRadius, {x:0, y:0}, "yellow")
 
-engine.newParticle(mercury.perihelion, 0, mercury.mass, mercury.radius, {x:0, y:mercury.maxSpeed}, "silver");
-engine.newParticle(venus.perihelion, 0, venus.mass, venus.radius, {x:0, y:venus.maxSpeed}, "purple");
-engine.newParticle(moon.perigee + earth.perihelion, 0, moon.mass, moon.radius, {x:0, y:moon.maxSpeed + earth.maxSpeed}, "gray");
-engine.newParticle(earth.perihelion, 0, earth.mass, earth.radius, {x:0, y:earth.maxSpeed}, "blue");
-engine.newParticle(mars.perihelion, 0, mars.mass, mars.radius, {x:0, y:mars.maxSpeed}, "red");
+engine.newParticle("Mercury", mercury.perihelion, 0, mercury.mass, mercury.radius, {x:0, y: mercury.maxSpeed}, "silver")
+engine.newParticle("Venus", venus.perihelion, 0, venus.mass, venus.radius, {x:0, y:venus.maxSpeed}, "purple");
+engine.newParticle("Moon", moon.perigee + earth.perihelion, 0, moon.mass, moon.radius, {x:0, y:moon.maxSpeed + earth.maxSpeed}, "gray");
+engine.newParticle("Earth", earth.perihelion, 0, earth.mass, earth.radius, {x:0, y:earth.maxSpeed}, "blue");
+engine.newParticle("Mars", mars.perihelion, 0, mars.mass, mars.radius, {x:0, y:mars.maxSpeed}, "red");
 
-engine.newParticle(jupiter.perihelion, 0, jupiter.mass, jupiter.radius, {x:0, y:jupiter.maxSpeed}, "orange");
-engine.newParticle(saturn.perihelion, 0, saturn.mass, saturn.radius, {x:0, y:saturn.maxSpeed}, "beige");
+engine.newParticle("Jupiter", jupiter.perihelion, 0, jupiter.mass, jupiter.radius, {x:0, y:jupiter.maxSpeed}, "orange");
+engine.newParticle("Saturn", saturn.perihelion, 0, saturn.mass, saturn.radius, {x:0, y:saturn.maxSpeed}, "beige");
 
 
 // inclusive
