@@ -12,7 +12,7 @@ import { State } from './classes/State.js';
 import { time } from './time.js';
 import { timeToString } from './time.js';
 
-import { Vector } from './classes/vector.js';
+import { Vector } from './classes/Vector.js';
 
 let newParticleButton = document.getElementById("newParticleContextMenuButton");
 let newHeavyParticleButton = document.getElementById("newHeavyParticleContextMenuButton");
